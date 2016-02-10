@@ -38,28 +38,35 @@ body {
   color: #C5D064;
 }
 
-.tweet__user, .tweet__time {
+.tweet__user, .tweet__time, .tweet__user_profile_image {
   background: #181818;
-  padding: 0 15px;
+}
+
+.tweet__user_profile_image {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  bottom: 30px;
+  left: 30px;
+  padding: 15px;
 }
 
 .tweet__user {
   position: absolute;
-  bottom: 86px;
-  margin-top: 20px;
-  float: left;
-  clear: left;
+  padding: 0 15px;
+  bottom: 82px;
+  height: 74px;
+  left: 164px;
 }
 
 .tweet__time {
   position: absolute;
+  padding: 0 5px;
   bottom: 30px;
+  height: 46px;
   color: #666;
   font-size: 60%;
-  float: left;
-  clear: left;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  left: 164px;
 }
 
 .stats {

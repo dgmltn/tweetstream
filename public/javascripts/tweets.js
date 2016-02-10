@@ -13,6 +13,7 @@ $(document).ready(function() {
     if(tweet != null) {
 
       $(".tweet__user").fadeOut();
+      $(".tweet__user_profile_image").fadeOut();
       $(".tweet__time").fadeOut();
 
       $(".tweet__text").fadeReplace(tweet.text, function(text) {
@@ -21,9 +22,12 @@ $(document).ready(function() {
           .replace(/\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i, "<span class='url'>\$1</span>");
       }, function() {
         $(".tweet__user").text("@" + tweet.user.screen_name);
+        var url = tweet.user.profile_image_url.replace("_normal", "");
+        $(".tweet__user_profile_image").html('<img height="96" width="96" src="' + url + '" />');
         $(".tweet__time abbr").attr('title', tweet.created_at);
         $(".timeago").timeago();
         $(".tweet__user").fadeIn(500);
+        $(".tweet__user_profile_image").fadeIn(500);
         $(".tweet__time").fadeIn(500);
       });
 
