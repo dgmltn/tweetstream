@@ -19,27 +19,38 @@ $(document).ready(function() {
       // Tweet data
       var text = tweet.text;
       var user = tweet.user.screen_name;
-      var profile_image_url = tweet.user.profile_image_url;
+      var profile_image_url = tweet.user.profile_image_url.replace("_normal", "");
       var created_at = tweet.created_at;
+      var entities = tweet.entities;
       var via;
       
-      // If this is a retweet, update the things
+      // If this is a retweet, use the original tweet instead
       if ('retweeted_status' in tweet) {
         text = tweet.retweeted_status.text;
         via = tweet.user.screen_name;
         user = tweet.retweeted_status.user.screen_name;
-        profile_image_url = tweet.retweeted_status.user.profile_image_url;
+        profile_image_url = tweet.retweeted_status.user.profile_image_url.replace("_normal", "");
         created_at = tweet.retweeted_status.created_at;
+        entities = tweet.retweeted_status.entities;
       }
 
-      // Post processing tweet data
-      profile_image_url = profile_image_url.replace("_normal", "");
-
       var formatter = function(text) {
+        var username_re = /(@\w+)/g;
+        var hashtag_re = /(#\w+)/g;
+        var url_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i
+        var url_replacer = function(match, offset, string) {
+          for (i in entities.urls) {
+            var url = entities.urls[i];
+            if (match == url.url) {
+                return "<span class='url'>" + url.display_url + "</span>";
+            }
+          }
+          return "<span class='url'>" + match + "</span>";
+        };
         return text
-          .replace(/(@\w+)/g, "<span class='username'>\$1</span>")
-          .replace(/(#\w+)/g, "<span class='hashtag'>\$1</span>")
-          .replace(/\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i, "<span class='url'>\$1</span>");
+          .replace(username_re, "<span class='username'>\$1</span>")
+          .replace(hashtag_re, "<span class='hashtag'>\$1</span>")
+          .replace(url_re, url_replacer);
       };
 
       // Callback will be called between fade out and fade in
