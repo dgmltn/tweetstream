@@ -12,6 +12,16 @@ body {
     color: #ddd;
 }
 
+.tweet__background {
+    position: absolute;
+    background-image: url('');
+    background-size: cover;
+    z-index: -1; /* Keep the background behind the content */
+    height: 100%; width: 100%;
+    -webkit-filter: brightness(60%);
+    margin: -40px;
+}
+
 .stats {
   position: absolute;
   bottom: 30px;
