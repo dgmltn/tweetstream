@@ -1,4 +1,7 @@
 $(document).ready(function() {
+  var username_re = /(@\w+)/g;
+  var hashtag_re = /(#\w+)/g;
+  var url_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i
 
   var tweets = [];
 
@@ -15,6 +18,7 @@ $(document).ready(function() {
       $(".tweet__user").fadeOut();
       $(".tweet__user_profile_image").fadeOut();
       $(".tweet__time").fadeOut();
+      $(".tweet__background").fadeOut();
 
       // Tweet data
       var text = tweet.text;
@@ -23,6 +27,7 @@ $(document).ready(function() {
       var created_at = tweet.created_at;
       var entities = tweet.entities;
       var via;
+      var background;
       
       // If this is a retweet, use the original tweet instead
       if ('retweeted_status' in tweet) {
@@ -34,19 +39,29 @@ $(document).ready(function() {
         entities = tweet.retweeted_status.entities;
       }
 
+      if ('media' in entities) {
+        background = entities.media[0];
+      }
+
       var formatter = function(text) {
-        var username_re = /(@\w+)/g;
-        var hashtag_re = /(#\w+)/g;
-        var url_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i
+
         var url_replacer = function(match, offset, string) {
+          // Expand t.co links
           for (i in entities.urls) {
             var url = entities.urls[i];
             if (match == url.url) {
                 return "<span class='url'>" + url.display_url + "</span>";
             }
           }
+
+          // This media url is the background picture. There's no need to show the url too.
+          if (background != undefined && text == background.url) {
+            return "";
+          }
+
           return "<span class='url'>" + match + "</span>";
         };
+
         return text
           .replace(username_re, "<span class='username'>\$1</span>")
           .replace(hashtag_re, "<span class='hashtag'>\$1</span>")
@@ -65,6 +80,13 @@ $(document).ready(function() {
         $(".tweet__user").fadeIn(500);
         $(".tweet__user_profile_image").fadeIn(500);
         $(".tweet__time").fadeIn(500);
+        if (background != undefined) {
+            $(".tweet__background").css('background-image', 'url(' + background.media_url + ')');
+            $(".tweet__background").fadeIn(500);
+        }
+        else {
+            $(".tweet__background").css('background-image', 'none');
+        }
       };
 
       $(".tweet__text").fadeReplace(text, formatter, callback);
