@@ -28,6 +28,11 @@ app.get('/', function (req, res) {
   res.render('index');
 });
 
+app.get('/latest', function(req,res){
+  res.setHeader('Content-Type', 'application/json');
+  res.send(JSON.stringify(getLatest()));
+});
+
 for (i in config.streams) {
     var stream_config = config.streams[i];
     if (stream_config.type == 'user') {
@@ -61,11 +66,15 @@ var buffer = [];
 var latest;
 var timeout;
 
+var getLatest = function() {
+    return { tweet: latest, pending: buffer.length };
+};
+
 var emitTweet = function() {
     timeout = undefined;
     if (buffer.length > 0) {
         latest = buffer.shift();
-        io.sockets.emit('tweet', { tweet: latest, pending: buffer.length });
+        io.sockets.emit('tweet', getLatest());
         console.log("emit: tweet, " + latest.text);
         debugTweet(latest);
         timeout = setTimeout(emitTweet, 6000);

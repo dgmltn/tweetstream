@@ -3,13 +3,7 @@ $(document).ready(function() {
   var hashtag_re = /(#\w+)/g;
   var url_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i
 
-  var tweets = [];
-
-  var socket = io();
-  socket.on('pending', function(data) {
-    $(".stats__pending .data").text(data);
-  });
-  socket.on('tweet', function(data) {
+  var render = function(data) {
     var tweet = data.tweet;
     if (tweet != null) {
 
@@ -89,5 +83,17 @@ $(document).ready(function() {
 
       $(".tweet__text").fadeReplace(text, formatter, callback);
     }
+  };
+
+  var tweets = [];
+
+  // Download the latest tweet immediately
+  $.getJSON("/latest", render);
+
+  // Download future tweets as they're streamed
+  var socket = io();
+  socket.on('pending', function(data) {
+    $(".stats__pending .data").text(data);
   });
+  socket.on('tweet', render);
 });
