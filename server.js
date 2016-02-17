@@ -58,32 +58,43 @@ for (i in config.streams) {
 }
 
 var buffer = [];
+var latest;
+var timeout;
 
-setInterval(function() {
+var emitTweet = function() {
+    timeout = undefined;
     if (buffer.length > 0) {
-        io.sockets.emit('tweet', { tweet: buffer.shift(), pending: buffer.length });
+        latest = buffer.shift();
+        io.sockets.emit('tweet', { tweet: latest, pending: buffer.length });
+        console.log("emit: tweet, " + latest.text);
+        debugTweet(latest);
+        timeout = setTimeout(emitTweet, 6000);
     }
-}, 6000);
+};
 
 function pushTweet(data) {
-    console.log("------------------------------------------------------------------");
     if ("text" in data && "id" in data) {
       buffer.push(data);
       io.sockets.emit('pending', buffer.length);
       console.log("emit: pending, " + buffer.length);
-//      console.log("tweet: " + data.text);
-//      console.log("tweet = ", JSON.stringify(data));
-//      console.log("entities = ", JSON.stringify(data.entities));
-      if ('entities' in data) { 
-        if ('urls' in data.entities && data.entities.urls.length > 0) {
-//          console.log("urls: ", data.entities.urls);
-        }
-        if ('media' in data.entities && data.entities.media.length > 0) {
-//          console.log("media: ", JSON.stringify(data.entities.media));
-        }
-      }
+      if (timeout === undefined) emitTweet();
     }
     else {
       console.log("ignoring non-tweet: " + JSON.stringify(data));
+    }
+}
+
+function debugTweet(data) {
+//    console.log("------------------------------------------------------------------");
+//    console.log("tweet: " + data.text);
+//    console.log("tweet = ", JSON.stringify(data));
+//    console.log("entities = ", JSON.stringify(data.entities));
+    if ('entities' in data) { 
+      if ('urls' in data.entities && data.entities.urls.length > 0) {
+//        console.log("urls: ", data.entities.urls);
+      }
+      if ('media' in data.entities && data.entities.media.length > 0) {
+//        console.log("media: ", JSON.stringify(data.entities.media));
+      }
     }
 }
