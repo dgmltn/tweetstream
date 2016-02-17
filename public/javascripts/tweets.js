@@ -45,7 +45,7 @@ $(document).ready(function() {
         }
 
         // This media url is the background picture. There's no need to show the url too.
-        if (background != undefined && text == background.url) {
+        if (background != undefined && match == background.url) {
           return "";
         }
 
