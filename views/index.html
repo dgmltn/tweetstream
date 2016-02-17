@@ -14,18 +14,18 @@
     {{/enable_cast}}
   </head>
   <body>
-    <div class="tweet__background"></div>
-    <div class="tweet">
-      <div class="tweet__text"></div>
-      <div class="tweet__user"></div>
-      <div class="tweet__user_profile_image"></div>
-      <div class="tweet__time">
-        <time class="timeago" datetime=""></time>
+    <div class="background"></div>
+    <div class="tweet__text"></div>
+    <div class="metadata_container">
+      <div class="user_profile_image"></div>
+      <div class="stats">
+        <span class="stats__pending">
+          <span class="data">0</span> pending tweets
+        </span>
       </div>
-    </div>
-    <div class="stats">
-      <div class="stats__pending">
-        <span class="data">0</span> pending tweets
+      <div class="user_and_time_container">
+        <span class="tweet__username"></span>
+        <span class="tweet__time"><time class="timeago" datetime=""></time></span>
       </div>
     </div>
     {{#enable_music}}

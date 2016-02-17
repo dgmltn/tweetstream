@@ -14,7 +14,7 @@ var twit = new twitter({
 var app = express();
 
 app.set('view engine', 'html');
-app.enable('view cache');
+//app.enable('view cache');
 app.engine('html', require('hogan-express'));
 
 app.use(express.static(__dirname + '/public'));

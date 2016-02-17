@@ -9,9 +9,8 @@ $(document).ready(function() {
     var tweet = data.tweet;
     if (tweet != null) {
 
-      $(".tweet__user").fadeOut();
-      $(".tweet__user_profile_image").fadeOut();
-      $(".tweet__time").fadeOut();
+      $(".user_and_time_container").fadeOut();
+      $(".user_profile_image").fadeOut();
       $(".tweet__background").fadeOut();
 
       // Tweet data
@@ -63,21 +62,20 @@ $(document).ready(function() {
 
       // Callback will be called between fade out and fade in
       var callback = function() {
-        $(".tweet__user").text("@" + user);
+        $(".tweet__username").text("@" + user);
         if (via !== undefined) {
-            $(".tweet__user").append('<span class="via">♻' + via + '</span>');
+            $(".tweet__username").append('<span class="via">♻' + via + '</span>');
         }
-        $(".tweet__user_profile_image").html('<img height="96" width="96" src="' + profile_image_url + '" />');
+        $(".user_profile_image").html('<img height="96" width="96" src="' + profile_image_url + '" />');
         $(".timeago").timeago("update", created_at);
-        $(".tweet__user").fadeIn(500);
-        $(".tweet__user_profile_image").fadeIn(500);
-        $(".tweet__time").fadeIn(500);
+        $(".user_and_time_container").fadeIn(500);
+        $(".user_profile_image").fadeIn(500);
         if (background != undefined) {
-            $(".tweet__background").css('background-image', 'url(' + background.media_url + ')');
-            $(".tweet__background").fadeIn(500);
+            $(".background").css('background-image', 'url(' + background.media_url + ')');
+            $(".background").fadeIn(500);
         }
         else {
-            $(".tweet__background").css('background-image', 'none');
+            $(".background").css('background-image', 'none');
         }
         $(".stats__pending .data").text(data.pending);
       };
