@@ -1,14 +1,39 @@
-<div class="tweet__background"></div>
-<div class="tweet">
-    <div class="tweet__text"></div>
-    <div class="tweet__user"></div>
-    <div class="tweet__user_profile_image"></div>
-    <div class="tweet__time">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en" {{#enable_cast}}data-cast-api-enabled="true"{{/enable_cast}}>
+  <head>
+    <title>Tweetstream</title>
+    <meta name="viewport" content="width=device-width,user-scalable=no">
+    <link href="/stylesheets/style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.fadeReplace.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/javascripts/jquery.timeago.js"></script>
+    <script type="text/javascript" src="/javascripts/tweets.js"></script>
+    {{#enable_cast}}
+    <script type="text/javascript" src="//www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+    <script type="text/javascript" src="/javascripts/cast_sender.js"></script>
+    {{/enable_cast}}
+  </head>
+  <body>
+    <div class="tweet__background"></div>
+    <div class="tweet">
+      <div class="tweet__text"></div>
+      <div class="tweet__user"></div>
+      <div class="tweet__user_profile_image"></div>
+      <div class="tweet__time">
         <time class="timeago" datetime=""></time>
+      </div>
     </div>
-</div>
-<div class="stats">
-    <div class="stats__pending">
+    <div class="stats">
+      <div class="stats__pending">
         <span class="data">0</span> pending tweets
+      </div>
     </div>
-</div>
+    {{#enable_music}}
+    <audio autoplay>
+      <source src="http://ice1.somafm.com/groovesalad-128-mp3" type="audio/mpeg">
+      <source src="http://ice2.somafm.com/groovesalad-128-mp3" type="audio/mpeg">
+    </audio>
+    {{/enable_music}}
+  </body>
+</html>
