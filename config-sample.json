@@ -1,0 +1,17 @@
+{
+  "port": "7080",
+  "consumer_key": "my-consumer-key",
+  "consumer_secret": "my-consumer-secret",
+  "access_token_key": "2345678-my-access-token",
+  "access_token_secret": "my-access-token-secret",
+  "streams": [
+    {
+      "type": "keyword",
+      "keyword": "manchester",
+      "bannedWords": ["united"]
+    },
+    {
+      "type": "user"
+    }
+  ]
+}

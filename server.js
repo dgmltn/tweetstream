@@ -1,16 +1,16 @@
 var express = require('express');
 var http = require('http');
 var twitter = require('twitter');
+
 var config = require('./config.json');
 
 var twit = new twitter({
-  consumer_key: process.env.TWITTER_CONSUMER_KEY,
-  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-  access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
-  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+  consumer_key: config.consumer_key,
+  consumer_secret: config.consumer_secret,
+  access_token_key: config.access_token_key,
+  access_token_secret: config.access_token_secret
 });
 
-var express = require("express");
 var app = express();
 
 app.set('view engine', 'html');
@@ -20,7 +20,7 @@ app.engine('html', require('hogan-express'));
 
 app.use(express.static(__dirname + '/public'));
 var server = http.createServer(app);
-server.listen(process.env.PORT || 7080);
+server.listen(config.port || 7080);
 
 var io = require('socket.io').listen(server);
 
@@ -28,13 +28,62 @@ app.get('/', function (req, res) {
   res.render('index');
 });
 
-var bannedWords = config.bannedWords.join('|');
-
-twit.stream('statuses/filter', { track: config.keyword }, function(stream) {
-  stream.on('data', function(data) {
-    var containsBannedWord = new RegExp(bannedWords, 'i').test(data.text) === true;
-    if (!containsBannedWord) {
-      io.sockets.emit('tweet', { tweet: data });
+for (i in config.streams) {
+    var stream_config = config.streams[i];
+    if (stream_config.type == 'user') {
+      twit.stream('user', { }, function(stream) {
+        stream.on('data', pushTweet);
+        stream.on('error', function(error) {
+          console.log(error);
+        });
+      });
     }
-  });
-});
+    else if (stream_config.type == 'keyword') {
+      var bannedWords = stream_config.bannedWords.join('|');
+      twit.stream('statuses/filter', { track: stream_config.keyword }, function(stream) {
+        stream.on('data', function(data) {
+          var containsBannedWord = new RegExp(bannedWords, 'i').test(data.text) === true;
+          if (!containsBannedWord) {
+            pushTweet(data);
+          }
+        });
+        stream.on('error', function(error) {
+          console.log(error);
+        });
+      });
+    }
+    else {
+      console.log("Unknown stream type, ignoring: " + JSON.stringify(stream_config));
+    }
+}
+
+var buffer = [];
+
+setInterval(function() {
+    if (buffer.length > 0) {
+        io.sockets.emit('tweet', { tweet: buffer.shift(), pending: buffer.length });
+    }
+}, 6000);
+
+function pushTweet(data) {
+    console.log("------------------------------------------------------------------");
+    if ("text" in data && "id" in data) {
+      buffer.push(data);
+      io.sockets.emit('pending', buffer.length);
+      console.log("emit: pending, " + buffer.length);
+//      console.log("tweet: " + data.text);
+//      console.log("tweet = ", JSON.stringify(data));
+//      console.log("entities = ", JSON.stringify(data.entities));
+      if ('entities' in data) { 
+        if ('urls' in data.entities && data.entities.urls.length > 0) {
+//          console.log("urls: ", data.entities.urls);
+        }
+        if ('media' in data.entities && data.entities.media.length > 0) {
+//          console.log("media: ", JSON.stringify(data.entities.media));
+        }
+      }
+    }
+    else {
+      console.log("ignoring non-tweet: " + JSON.stringify(data));
+    }
+}

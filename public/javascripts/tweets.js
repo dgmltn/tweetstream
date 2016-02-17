@@ -6,14 +6,12 @@ $(document).ready(function() {
   var tweets = [];
 
   var socket = io();
-  socket.on('tweet', function(data) {
-    tweets.push(data.tweet);
-    $(".stats__pending .data").text(tweets.length);
+  socket.on('pending', function(data) {
+    $(".stats__pending .data").text(data);
   });
-
-  setInterval(function() {
-    var tweet = tweets.shift();
-    if(tweet != null) {
+  socket.on('tweet', function(data) {
+    var tweet = data.tweet;
+    if (tweet != null) {
 
       $(".tweet__user").fadeOut();
       $(".tweet__user_profile_image").fadeOut();
@@ -43,25 +41,24 @@ $(document).ready(function() {
         background = entities.media[0];
       }
 
+      var url_replacer = function(match, offset, string) {
+        // Expand t.co links
+        for (i in entities.urls) {
+          var url = entities.urls[i];
+          if (match == url.url) {
+              return "<span class='url'>" + url.display_url + "</span>";
+          }
+        }
+
+        // This media url is the background picture. There's no need to show the url too.
+        if (background != undefined && text == background.url) {
+          return "";
+        }
+
+        return "<span class='url'>" + match + "</span>";
+      };
+
       var formatter = function(text) {
-
-        var url_replacer = function(match, offset, string) {
-          // Expand t.co links
-          for (i in entities.urls) {
-            var url = entities.urls[i];
-            if (match == url.url) {
-                return "<span class='url'>" + url.display_url + "</span>";
-            }
-          }
-
-          // This media url is the background picture. There's no need to show the url too.
-          if (background != undefined && text == background.url) {
-            return "";
-          }
-
-          return "<span class='url'>" + match + "</span>";
-        };
-
         return text
           .replace(username_re, "<span class='username'>\$1</span>")
           .replace(hashtag_re, "<span class='hashtag'>\$1</span>")
@@ -87,11 +84,10 @@ $(document).ready(function() {
         else {
             $(".tweet__background").css('background-image', 'none');
         }
+        $(".stats__pending .data").text(data.pending);
       };
 
       $(".tweet__text").fadeReplace(text, formatter, callback);
-
-      $(".stats__pending .data").text(tweets.length);
     }
-  }, 6000)
+  });
 });
