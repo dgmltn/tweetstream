@@ -42,7 +42,7 @@ $(document).ready(function() {
         for (i in entities.urls) {
           var url = entities.urls[i];
           if (match == url.url) {
-              return "<span class='url'>" + url.display_url + "</span>";
+              return "<span class='url'>" + url.display_url + " </span>";
           }
         }
 
@@ -51,7 +51,7 @@ $(document).ready(function() {
           return "";
         }
 
-        return "<span class='url'>" + match + "</span>";
+        return "<span class='url'>" + match + " </span>";
       };
 
       var formatter = function(text) {

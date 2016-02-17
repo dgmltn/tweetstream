@@ -32,10 +32,6 @@ body {
   font-size: 120%;
 }
 
-.tweet__text span {
-  float: left;
-}
-
 .tweet__text .username {
   color: #DD6668;
 }
