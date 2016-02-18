@@ -14,7 +14,6 @@ var twit = new twitter({
 var app = express();
 
 app.set('view engine', 'html');
-app.set('layout', 'layout');
 app.enable('view cache');
 app.engine('html', require('hogan-express'));
 
@@ -25,10 +24,14 @@ server.listen(config.port || 7080);
 var io = require('socket.io').listen(server);
 
 app.get('/', function (req, res) {
-  res.render('index');
+  res.render('index', { enable_cast: true } );
 });
 
-app.get('/latest', function(req,res){
+app.get('/receiver', function(req, res) {
+  res.render('index', { enable_music: true } );
+});
+
+app.get('/latest', function(req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.send(JSON.stringify(getLatest()));
 });
