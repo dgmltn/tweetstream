@@ -2,6 +2,8 @@ $(document).ready(function() {
   var username_re = /(@\w+)/g;
   var hashtag_re = /(#\w+)/g;
   var url_re = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i
+  $('.timeago').attr('datetime', new Date());
+  $('.timeago').timeago();
 
   var render = function(data) {
     var tweet = data.tweet;
@@ -66,8 +68,7 @@ $(document).ready(function() {
             $(".tweet__user").append('<span class="via">♻' + via + '</span>');
         }
         $(".tweet__user_profile_image").html('<img height="96" width="96" src="' + profile_image_url + '" />');
-        $(".tweet__time abbr").attr('title', created_at);
-        $(".timeago").timeago();
+        $(".timeago").timeago("update", created_at);
         $(".tweet__user").fadeIn(500);
         $(".tweet__user_profile_image").fadeIn(500);
         $(".tweet__time").fadeIn(500);
