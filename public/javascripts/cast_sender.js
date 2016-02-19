@@ -8,6 +8,14 @@ var session;
 
 var remoteUrl = window.location.protocol + "//" + window.location.host + "/receiver";
 
+// Add required cast sender bits to the html document
+$(function() {
+  var imported = document.createElement('script');
+  imported.src = '//www.gstatic.com/cv/js/sender/v1/cast_sender.js';
+  document.head.appendChild(imported);
+  $("html").attr("data-cast-api-enabled", 'true');
+});
+
 window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
   if (loaded) {
     log("loaded");
