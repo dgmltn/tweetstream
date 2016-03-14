@@ -28,7 +28,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/receiver', function(req, res) {
-  res.render('index', { enable_music: true } );
+  res.render('index', { enable_music: false } );
 });
 
 app.get('/latest', function(req, res) {
