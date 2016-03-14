@@ -21,6 +21,7 @@ $(document).ready(function() {
       var entities = tweet.entities;
       var via;
       var background;
+      var hide = {};
       
       // If this is a retweet, use the original tweet instead
       if ('retweeted_status' in tweet) {
@@ -32,25 +33,44 @@ $(document).ready(function() {
         entities = tweet.retweeted_status.entities;
       }
 
-      if ('media' in entities) {
-        background = entities.media[0];
+      // Add quoted tweets as a blockquote
+      if ('quoted_status' in tweet) {
+        text += "<blockquote>@" + tweet.quoted_status.user.screen_name + " - " + tweet.quoted_status.text + "</blockquote>";
+        var expanded_url = 'https://twitter.com/' + tweet.quoted_status.user.screen_name + '/status/' + tweet.quoted_status.id_str;
+        for (i in tweet.entities.urls) {
+          var url = tweet.entities.urls[i];
+          if (url.expanded_url == expanded_url) {
+            hide[url.url] = 1;
+          }
+        }
       }
 
+      if ('media' in entities) {
+        background = entities.media[0];
+        hide[background.url] = 1;
+      }
+
+      //TODO: expand instagram links, like:
+      // https://www.instagram.com/p/BCHDRbgh9eT/media?size=l
+
       var url_replacer = function(match, offset, string) {
+        // This url is otherwise represented. No need to show it.
+        if (match in hide) {
+          return "";
+        }
+
+        var display = match;
+
         // Expand t.co links
         for (i in entities.urls) {
           var url = entities.urls[i];
           if (match == url.url) {
-              return "<span class='url'>" + url.display_url + " </span>";
+            display = url.display_url;
+            break;
           }
         }
 
-        // This media url is the background picture. There's no need to show the url too.
-        if (background != undefined && match == background.url) {
-          return "";
-        }
-
-        return "<span class='url'>" + match + " </span>";
+        return "<span class='url'>" + display + " </span>";
       };
 
       var formatter = function(text) {
