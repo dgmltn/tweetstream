@@ -9,9 +9,8 @@ $(document).ready(function() {
     var tweet = data.tweet;
     if (tweet != null) {
 
-      $(".tweet__user").fadeOut();
-      $(".tweet__user_profile_image").fadeOut();
-      $(".tweet__time").fadeOut();
+      $(".user_and_time_container").fadeOut();
+      $(".user_profile_image").fadeOut();
       $(".tweet__background").fadeOut();
 
       // Tweet data
@@ -22,6 +21,7 @@ $(document).ready(function() {
       var entities = tweet.entities;
       var via;
       var background;
+      var hide = {};
       
       // If this is a retweet, use the original tweet instead
       if ('retweeted_status' in tweet) {
@@ -33,25 +33,44 @@ $(document).ready(function() {
         entities = tweet.retweeted_status.entities;
       }
 
-      if ('media' in entities) {
-        background = entities.media[0];
+      // Add quoted tweets as a blockquote
+      if ('quoted_status' in tweet) {
+        text += "<blockquote>@" + tweet.quoted_status.user.screen_name + " - " + tweet.quoted_status.text + "</blockquote>";
+        var expanded_url = 'https://twitter.com/' + tweet.quoted_status.user.screen_name + '/status/' + tweet.quoted_status.id_str;
+        for (i in tweet.entities.urls) {
+          var url = tweet.entities.urls[i];
+          if (url.expanded_url == expanded_url) {
+            hide[url.url] = 1;
+          }
+        }
       }
 
+      if ('media' in entities) {
+        background = entities.media[0];
+        hide[background.url] = 1;
+      }
+
+      //TODO: expand instagram links, like:
+      // https://www.instagram.com/p/BCHDRbgh9eT/media?size=l
+
       var url_replacer = function(match, offset, string) {
+        // This url is otherwise represented. No need to show it.
+        if (match in hide) {
+          return "";
+        }
+
+        var display = match;
+
         // Expand t.co links
         for (i in entities.urls) {
           var url = entities.urls[i];
           if (match == url.url) {
-              return "<span class='url'>" + url.display_url + "</span>";
+            display = url.display_url;
+            break;
           }
         }
 
-        // This media url is the background picture. There's no need to show the url too.
-        if (background != undefined && match == background.url) {
-          return "";
-        }
-
-        return "<span class='url'>" + match + "</span>";
+        return "<span class='url'>" + display + " </span>";
       };
 
       var formatter = function(text) {
@@ -63,21 +82,20 @@ $(document).ready(function() {
 
       // Callback will be called between fade out and fade in
       var callback = function() {
-        $(".tweet__user").text("@" + user);
+        $(".tweet__username").text("@" + user);
         if (via !== undefined) {
-            $(".tweet__user").append('<span class="via">♻' + via + '</span>');
+            $(".tweet__username").append('<span class="via">♻' + via + '</span>');
         }
-        $(".tweet__user_profile_image").html('<img height="96" width="96" src="' + profile_image_url + '" />');
+        $(".user_profile_image").html('<img height="96" width="96" src="' + profile_image_url + '" />');
         $(".timeago").timeago("update", created_at);
-        $(".tweet__user").fadeIn(500);
-        $(".tweet__user_profile_image").fadeIn(500);
-        $(".tweet__time").fadeIn(500);
+        $(".user_and_time_container").fadeIn(500);
+        $(".user_profile_image").fadeIn(500);
         if (background != undefined) {
-            $(".tweet__background").css('background-image', 'url(' + background.media_url + ')');
-            $(".tweet__background").fadeIn(500);
+            $(".background").css('background-image', 'url(' + background.media_url + ')');
+            $(".background").fadeIn(500);
         }
         else {
-            $(".tweet__background").css('background-image', 'none');
+            $(".background").css('background-image', 'none');
         }
         $(".stats__pending .data").text(data.pending);
       };

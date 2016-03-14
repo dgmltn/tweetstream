@@ -31,7 +31,7 @@
   function textToSpans(text, formatter) {
     var words = text.split(" ");
     return $.map(words, function(val, i) {
-      return "<span>" + formatter(val) + "&nbsp;</span>";
+      return "<span>" + formatter(val) + " </span>";
     });
   }
 })(jQuery);

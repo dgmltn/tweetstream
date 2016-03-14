@@ -14,7 +14,7 @@ var twit = new twitter({
 var app = express();
 
 app.set('view engine', 'html');
-app.enable('view cache');
+//app.enable('view cache');
 app.engine('html', require('hogan-express'));
 
 app.use(express.static(__dirname + '/public'));
@@ -28,7 +28,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/receiver', function(req, res) {
-  res.render('index', { enable_music: true } );
+  res.render('index', { enable_music: false } );
 });
 
 app.get('/latest', function(req, res) {
