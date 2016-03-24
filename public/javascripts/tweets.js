@@ -5,6 +5,17 @@ $(document).ready(function() {
   $('.timeago').attr('datetime', new Date());
   $('.timeago').timeago();
 
+
+  var updatePendingTweets = function(data) {
+    $(".stats__pending .data").text(data);
+    if (data == 0) {
+      $(".stats__pending").fadeOut();
+    }
+    else {
+      $(".stats__pending").fadeIn();
+    }
+  };
+
   var render = function(data) {
     var tweet = data.tweet;
     if (tweet != null) {
@@ -100,7 +111,7 @@ $(document).ready(function() {
         else {
             $(".background").css('background-image', 'none');
         }
-        $(".stats__pending .data").text(data.pending);
+        updatePendingTweets(data.pending);
       };
 
       $(".tweet__text").fadeReplace(text, formatter, callback);
@@ -114,8 +125,6 @@ $(document).ready(function() {
 
   // Download future tweets as they're streamed
   var socket = io();
-  socket.on('pending', function(data) {
-    $(".stats__pending .data").text(data);
-  });
+  socket.on('pending', updatePendingTweets);
   socket.on('tweet', render);
 });
