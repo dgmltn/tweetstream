@@ -70,6 +70,9 @@ $(document).ready(function() {
           }
         }
 
+        // Turn all links into 🔗  because they're not clickable anyway
+        display = '🔗';
+
         return "<span class='url'>" + display + " </span>";
       };
 
