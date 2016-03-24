@@ -80,7 +80,7 @@ var emitTweet = function() {
         io.sockets.emit('tweet', getLatest());
         console.log("emit: tweet, " + latest.text);
         debugTweet(latest);
-        timeout = setTimeout(emitTweet, 6000);
+        timeout = setTimeout(emitTweet, 10000);
     }
 };
 
