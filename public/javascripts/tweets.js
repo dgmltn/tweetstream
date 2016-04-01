@@ -26,43 +26,22 @@ $(document).ready(function() {
 
       // Tweet data
       var text = tweet.text;
-      var user = tweet.user.screen_name;
-      var profile_image_url = tweet.user.profile_image_url.replace("_normal", "");
-      var created_at = tweet.created_at;
-      var entities = tweet.entities;
-      var via;
-      var background;
-      var hide = {};
       
-      // If this is a retweet, use the original tweet instead
-      if ('retweeted_status' in tweet) {
-        text = tweet.retweeted_status.text;
-        via = tweet.user.screen_name;
-        user = tweet.retweeted_status.user.screen_name;
-        profile_image_url = tweet.retweeted_status.user.profile_image_url.replace("_normal", "");
-        created_at = tweet.retweeted_status.created_at;
-        entities = tweet.retweeted_status.entities;
-      }
-
       // Add quoted tweets as a blockquote
-      if ('quoted_status' in tweet) {
-        text += "<blockquote>@" + tweet.quoted_status.user.screen_name + " - " + tweet.quoted_status.text + "</blockquote>";
-        var expanded_url = 'https://twitter.com/' + tweet.quoted_status.user.screen_name + '/status/' + tweet.quoted_status.id_str;
-        for (i in tweet.entities.urls) {
-          var url = tweet.entities.urls[i];
-          if (url.expanded_url == expanded_url) {
-            hide[url.url] = 1;
+      if ('quote' in tweet) {
+        text += "<blockquote>" + tweet.quote + "</blockquote>";
+      }
+
+      var hide = {};
+      for (i in tweet.urls) {
+          var shortUrl = i;
+          var expandedUrl = tweet.urls[i].expanded;
+          var displayUrl = tweet.urls[i].display;
+          if (expandedUrl == tweet.quote_url 
+              || expandedUrl == tweet.background) {
+              hide[shortUrl] = 1;
           }
-        }
       }
-
-      if ('media' in entities) {
-        background = entities.media[0];
-        hide[background.url] = 1;
-      }
-
-      //TODO: expand instagram links, like:
-      // https://www.instagram.com/p/BCHDRbgh9eT/media?size=l
 
       var url_replacer = function(match, offset, string) {
         // This url is otherwise represented. No need to show it.
@@ -73,16 +52,18 @@ $(document).ready(function() {
         var display = match;
 
         // Expand t.co links
-        for (i in entities.urls) {
-          var url = entities.urls[i];
-          if (match == url.url) {
-            display = url.display_url;
+        for (i in tweet.urls) {
+          var shortUrl = i;
+          var expandedUrl = tweet.urls[i].expanded;
+          var displayUrl = tweet.urls[i].display;
+          if (match == shortUrl) {
+            display = displayUrl;
             break;
           }
         }
 
         // Turn all links into 🔗  because they're not clickable anyway
-        display = '🔗';
+        //TODO for now comment out display = '🔗';
 
         return "<span class='url'>" + display + " </span>";
       };
@@ -96,16 +77,16 @@ $(document).ready(function() {
 
       // Callback will be called between fade out and fade in
       var callback = function() {
-        $(".tweet__username").text("@" + user);
-        if (via !== undefined) {
-            $(".tweet__username").append('<span class="via">♻' + via + '</span>');
+        $(".tweet__username").text("@" + tweet.user_name);
+        if (tweet.via_user_name) {
+            $(".tweet__username").append('<span class="via">♻' + tweet.via_user_name + '</span>');
         }
-        $(".user_profile_image").html('<img height="96" width="96" src="' + profile_image_url + '" />');
-        $(".timeago").timeago("update", created_at);
+        $(".user_profile_image").html('<img height="96" width="96" src="' + tweet.user_avatar + '" />');
+        $(".timeago").timeago("update", tweet.created_at);
         $(".user_and_time_container").fadeIn(500);
         $(".user_profile_image").fadeIn(500);
-        if (background != undefined) {
-            $(".background").css('background-image', 'url(' + background.media_url + ')');
+        if (tweet.background) {
+            $(".background").css('background-image', 'url(' + tweet.background + ')');
             $(".background").fadeIn(500);
         }
         else {
